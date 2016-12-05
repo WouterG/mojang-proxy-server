@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.wouto.proxy.cache.GameProfileCache;
 import net.wouto.proxy.exception.InvalidProxyKeyException;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
@@ -33,13 +32,13 @@ public class MojangProxyServer {
 		this.objectMapperPretty = new ObjectMapper();
 		this.objectMapperPretty.configure(SerializationFeature.INDENT_OUTPUT, true);
 		if (GAME_PROFILE_CACHE_CLASS == null) {
-			this.gameProfileCache = new GameProfileCache(this.config);
+			this.gameProfileCache = new GameProfileCache(MojangProxyServer.config);
 			System.out.println("Using default in-memory GameProfileCache");
 		} else {
 			try {
-				Class c = Class.forName(GAME_PROFILE_CACHE_CLASS);
-				Constructor cons = c.getDeclaredConstructor(Config.class);
-				this.gameProfileCache = (GameProfileCache) cons.newInstance(config);
+				Class<GameProfileCache> c = (Class<GameProfileCache>) Class.forName(GAME_PROFILE_CACHE_CLASS);
+				Constructor<GameProfileCache> cons = c.getDeclaredConstructor(Config.class);
+				this.gameProfileCache = cons.newInstance(MojangProxyServer.config);
 			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
 				e.printStackTrace();
 			}

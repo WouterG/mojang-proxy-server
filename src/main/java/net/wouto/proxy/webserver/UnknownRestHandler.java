@@ -32,7 +32,7 @@ public class UnknownRestHandler {
 	public BaseResponse handleUnknownRequest(HttpServletRequest request) throws Exception {
 		String body = null;
 		if (request.getMethod().equals(RequestMethod.POST.name())) {
-			StringBuffer jb = new StringBuffer();
+			StringBuilder jb = new StringBuilder();
 			String line;
 			BufferedReader reader = request.getReader();
 			while ((line = reader.readLine()) != null) {

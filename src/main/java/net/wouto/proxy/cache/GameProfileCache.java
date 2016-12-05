@@ -12,6 +12,7 @@ import net.wouto.proxy.response.result.ProfileSearchResultsResponseImpl;
 import net.wouto.proxy.service.MojangAPI;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -39,8 +40,11 @@ public class GameProfileCache {
     public MinecraftProfilePropertiesResponseImpl fillGameProfile(String uuid, boolean unsigned) {
         MinecraftProfilePropertiesResponseImpl response = null;
         try {
-            response = new MinecraftProfilePropertiesResponseImpl(this.uuidProfileCache.get(Util.deserialize(uuid), getNullProfile));
-        } catch (Exception e) {
+            UUID uuidObj = Util.deserialize(uuid);
+            if (uuidObj != null) {
+                response = new MinecraftProfilePropertiesResponseImpl(this.uuidProfileCache.get(uuidObj, getNullProfile));
+            }
+        } catch (Exception ignored) {
         }
         if (response == null) {
             response = MojangAPI.getInstance().fillGameProfile(uuid, true);
@@ -61,15 +65,13 @@ public class GameProfileCache {
                     profiles.add(profile);
                     return true;
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             return false;
         });
         if (!names.isEmpty()) {
             ProfileSearchResultsResponseImpl res = MojangAPI.getInstance().findProfilesByNames(names);
-            for (GameProfile profile : res.getProfiles()) {
-                profiles.add(profile);
-            }
+            Collections.addAll(profiles, res.getProfiles());
         }
         response.setProfiles(profiles.toArray(new GameProfile[profiles.size()]));
         // <DEBUG>
@@ -100,7 +102,7 @@ public class GameProfileCache {
             GameProfile profile = null;
             try {
                 profile = this.nameProfileCache.get(username, getNullProfile);
-            } catch (Exception e2) {
+            } catch (Exception ignored) {
 
             }
             if (profile != null) {

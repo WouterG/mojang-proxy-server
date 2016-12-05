@@ -7,18 +7,15 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.HttpAuthenticationService;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
-import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.yggdrasil.YggdrasilGameProfileRepository;
 import com.mojang.authlib.yggdrasil.response.ProfileSearchResultsResponse;
 import com.mojang.util.UUIDTypeAdapter;
-import net.wouto.proxy.cache.GameProfileCache;
 import net.wouto.proxy.response.result.HasJoinedMinecraftServerResponseImpl;
 import net.wouto.proxy.response.result.MinecraftProfilePropertiesResponseImpl;
 import net.wouto.proxy.response.result.ProfileSearchResultsResponseImpl;
 
 import java.net.Proxy;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,14 +70,11 @@ public class MojangAPI {
 		HashSet<String> nameSet = Sets.newHashSet();
 		nameSet.addAll(names);
 
-		Iterator nameSetIterator = Iterables.partition(nameSet, 100).iterator();
-
-		while (nameSetIterator.hasNext()) {
-			List nameSetPart = (List) nameSetIterator.next();
+		for (Object o : Iterables.partition(nameSet, 100)) {
+			List nameSetPart = (List) o;
 			try {
 				ProfileSearchResultsResponse result = this.authenticationService.makeRequest(HttpAuthenticationService.constantURL("https://api.mojang.com/profiles/" + game.getName().toLowerCase()), nameSetPart, ProfileSearchResultsResponse.class);
-				ProfileSearchResultsResponseImpl resultImpl = new ProfileSearchResultsResponseImpl(result.getProfiles());
-				return resultImpl;
+				return new ProfileSearchResultsResponseImpl(result.getProfiles());
 			} catch (AuthenticationException e) {
 				e.printStackTrace();
 			}

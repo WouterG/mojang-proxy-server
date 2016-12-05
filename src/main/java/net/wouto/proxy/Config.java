@@ -5,6 +5,7 @@ import java.util.Properties;
 
 public class Config extends Properties {
 
+    private static final long serialVersionUID = -2452195490742797839L;
     private File file;
 
     private Config(File file) throws IOException {
